@@ -45,6 +45,21 @@ class Slack
     }
 
     /**
+	 * Set the webhook url
+	 *
+	 * @param  string $url
+	 *
+	 * @return $this
+	 */
+	public function webhook($url): self
+	{
+        if($this->anonymousNotifiable->routes['slack'] != $url)
+			$this->anonymousNotifiable = Notification::route('slack', $url);
+
+		return $this;
+	}
+
+    /**
      * Set the recipients of the message.
      *
      * @param  object|array|string $recipient
@@ -86,6 +101,10 @@ class Slack
         }
 
         $this->recipients = [$this->config['default_channel']];
+
+        // Set as default webhook after sending message
+	    if($this->anonymousNotifiable->routes['slack'] != $this->config['slack_webhook_url'])
+            $this->anonymousNotifiable = Notification::route('slack', $this->config['slack_webhook_url']);
     }
 
     protected function notify(SlackMessage $slackMessage)
